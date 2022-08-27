@@ -67,7 +67,7 @@ const Landing = () => {
                 width="250px"
                 height="250px"
                 elevation={2}
-                marginTop={32}
+                marginTop={16}
             >
                 <img width="250px" src={photo} alt="profile" />
             </Pane>
