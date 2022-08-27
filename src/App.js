@@ -9,7 +9,7 @@ function App() {
         <div>
             <ThemeProvider value={appTheme}>
                 <Routes>
-                    <Route path="/view/:id" element={<Landing />} />
+                    <Route path="/:id" element={<Landing />} />
                 </Routes>
             </ThemeProvider>
         </div>
