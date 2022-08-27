@@ -22,6 +22,7 @@ const Landing = () => {
         setRecord(rec[0].fields);
         setPhoto(rec[0].fields.photo[0].url);
         setIsLoading(false);
+        document.title = rec[0].fields.name;
     };
 
     const fetchData = async () => {
