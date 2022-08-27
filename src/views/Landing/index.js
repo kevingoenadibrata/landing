@@ -1,5 +1,7 @@
+import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Airtable from 'airtable';
-import { Heading, Pane, Text } from 'evergreen-ui';
+import { Button, Heading, Pane, Spinner, Text } from 'evergreen-ui';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Badge from '../../components/Badge';
@@ -8,14 +10,16 @@ const Landing = () => {
     const params = useParams();
     const [record, setRecord] = useState({});
     const [photo, setPhoto] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
 
     const callbackResponse = (err, rec) => {
-        if (err) {
+        if (err || rec.length === 0) {
             console.error(err);
             return;
         }
-        setRecord(rec.fields);
-        setPhoto(rec.fields.photo[0].url);
+        setRecord(rec[0].fields);
+        setPhoto(rec[0].fields.photo[0].url);
+        setIsLoading(false);
     };
 
     const fetchData = async () => {
@@ -24,12 +28,27 @@ const Landing = () => {
             apiKey: process.env.REACT_APP_AIRTABLE_API_KEY
         });
         const base = Airtable.base(process.env.REACT_APP_AIRTABLE_BASE);
-        base('Table 1').find(params.id, callbackResponse);
+        const selectQuery = {
+            filterByFormula: `SEARCH("${params.id}", {username})`
+        };
+        base('Table 1').select(selectQuery).firstPage(callbackResponse);
     };
 
     useEffect(() => {
         fetchData();
     }, []);
+
+    const handleWhatsappClick = () => {
+        window.open(record?.whatsapp, '_blank');
+    };
+
+    if (isLoading) {
+        return (
+            <Pane display="flex" justifyContent="center" marginTop={32}>
+                <Spinner />
+            </Pane>
+        );
+    }
 
     return (
         <Pane
@@ -48,9 +67,9 @@ const Landing = () => {
                 width="250px"
                 height="250px"
                 elevation={2}
-                marginBottom={32}
+                marginTop={32}
             >
-                <img width="250px" src={photo} />
+                <img width="250px" src={photo} alt="profile" />
             </Pane>
 
             <Pane
@@ -59,6 +78,7 @@ const Landing = () => {
                 display="flex"
                 flexDirection="column"
                 justifyContent="center"
+                alignItems="center"
                 padding={32}
             >
                 <Heading size={800} textAlign="center">
@@ -73,6 +93,21 @@ const Landing = () => {
                 <Text marginTop={16} textAlign="center">
                     {record?.description3}
                 </Text>
+
+                {record.whatsapp && (
+                    <Pane marginTop={16}>
+                        <Button
+                            onClick={handleWhatsappClick}
+                            appearance="primary"
+                            intent="success"
+                        >
+                            <Pane marginRight={8}>
+                                <FontAwesomeIcon icon={faWhatsapp} />
+                            </Pane>
+                            Whatsapp
+                        </Button>
+                    </Pane>
+                )}
             </Pane>
             <Badge />
         </Pane>
