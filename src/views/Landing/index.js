@@ -2,6 +2,7 @@ import Airtable from 'airtable';
 import { Heading, Pane, Text } from 'evergreen-ui';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import Badge from '../../components/Badge';
 
 const Landing = () => {
     const params = useParams();
@@ -58,20 +59,22 @@ const Landing = () => {
                 display="flex"
                 flexDirection="column"
                 justifyContent="center"
+                padding={32}
             >
-                <Heading size={900} textAlign="center">
+                <Heading size={800} textAlign="center">
                     {record?.name}
                 </Heading>
-                <Text marginTop={8} textAlign="center">
+                <Text marginTop={16} textAlign="center">
                     {record?.description}
                 </Text>
-                <Text marginTop={8} textAlign="center">
+                <Text marginTop={16} textAlign="center">
                     {record?.description2}
                 </Text>
-                <Text marginTop={8} textAlign="center">
+                <Text marginTop={16} textAlign="center">
                     {record?.description3}
                 </Text>
             </Pane>
+            <Badge />
         </Pane>
     );
 };
