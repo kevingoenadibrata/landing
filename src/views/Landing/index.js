@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Airtable from 'airtable';
 import { Button, Heading, Pane, Spinner, Text } from 'evergreen-ui';
 import { useEffect, useState } from 'react';
+import ReactCardFlip from 'react-card-flip';
 import { useParams } from 'react-router-dom';
 import Badge from '../../components/Badge';
 
@@ -15,16 +16,23 @@ const Landing = () => {
     const params = useParams();
     const [record, setRecord] = useState({});
     const [photo, setPhoto] = useState('');
+    const [photo2, setPhoto2] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isImageReady, setIsImageReady] = useState(false);
+    const [isSpotifyReady, setIsSpotifyReady] = useState(false);
+    const [isMapsReady, setIsMapsReady] = useState(false);
+    const [isFlipped, setIsFlipped] = useState(false);
 
     const callbackResponse = (err, rec) => {
         if (err || rec.length === 0) {
             console.error(err);
             return;
         }
+        console.log(rec[0]);
         setRecord(rec[0].fields);
         setPhoto(rec[0].fields.photo[0].url);
+        if (rec[0].fields.photo_secondary)
+            setPhoto2(rec[0].fields.photo_secondary[0].url);
         setIsLoading(false);
         document.title = rec[0].fields.name;
     };
@@ -67,6 +75,15 @@ const Landing = () => {
         );
     };
 
+    const handleImageFlip = () => {
+        if (!photo2) {
+            setIsFlipped(false);
+            return;
+        }
+
+        setIsFlipped(!isFlipped);
+    };
+
     if (isLoading) {
         return (
             <Pane display="flex" justifyContent="center" marginTop={32}>
@@ -83,30 +100,53 @@ const Landing = () => {
             alignItems="center"
             flexDirection="column"
         >
-            <Pane
-                borderRadius={8}
-                overflow="hidden"
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                width="250px"
-                height="250px"
-                elevation={2}
-            >
-                {!isImageReady && <Spinner position="absolute" />}
+            <ReactCardFlip isFlipped={isFlipped}>
                 <Pane
-                    opacity={isImageReady ? 1 : 0}
-                    transitionDuration="1000ms"
+                    borderRadius={8}
+                    overflow="hidden"
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    width="250px"
+                    height="250px"
+                    elevation={2}
+                    onClick={handleImageFlip}
                 >
-                    <img
-                        width="260px"
-                        height="260px"
-                        src={photo}
-                        alt="profile"
-                        onLoad={() => setIsImageReady(true)}
-                    />
+                    {!isImageReady && <Spinner position="absolute" />}
+                    <Pane
+                        opacity={isImageReady ? 1 : 0}
+                        transitionDuration="1000ms"
+                    >
+                        <img
+                            width="260px"
+                            height="260px"
+                            src={photo}
+                            alt="profile"
+                            onLoad={() => setIsImageReady(true)}
+                        />
+                    </Pane>
                 </Pane>
-            </Pane>
+                <Pane
+                    borderRadius={8}
+                    overflow="hidden"
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    width="250px"
+                    height="250px"
+                    elevation={2}
+                    onClick={handleImageFlip}
+                >
+                    <Pane>
+                        <img
+                            width="260px"
+                            height="260px"
+                            src={photo2}
+                            alt="profile"
+                        />
+                    </Pane>
+                </Pane>
+            </ReactCardFlip>
 
             <Pane
                 width="100vw"
@@ -130,7 +170,7 @@ const Landing = () => {
                     {record?.description3}
                 </Text>
                 <Pane
-                    marginTop={16}
+                    marginTop={32}
                     display="flex"
                     gap={8}
                     alignItems="center"
@@ -162,15 +202,6 @@ const Landing = () => {
                         </Button>
                     )}
 
-                    {record.website && (
-                        <Button onClick={handleWebsiteClick}>
-                            <Pane marginRight={8}>
-                                <FontAwesomeIcon icon={faGlobe} />
-                            </Pane>
-                            Website
-                        </Button>
-                    )}
-
                     {record.linkedin_username && (
                         <Button
                             onClick={handleLinkedinClick}
@@ -182,20 +213,78 @@ const Landing = () => {
                             LinkedIn
                         </Button>
                     )}
+
+                    {record.website && (
+                        <Button onClick={handleWebsiteClick}>
+                            <Pane marginRight={8}>
+                                <FontAwesomeIcon icon={faGlobe} />
+                            </Pane>
+                            Website
+                        </Button>
+                    )}
                 </Pane>
             </Pane>
             {record.spotify_id && (
-                <Pane marginTop={32} width="100%" padding={16}>
-                    <iframe
-                        style={{ borderRadius: '12px' }}
-                        src={`https://open.spotify.com/embed/playlist/${record.spotify_id}?utm_source=generator`}
-                        width="100%%"
-                        height="380"
-                        frameBorder="0"
-                        allowfullscreen=""
-                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                        title="Spotify"
-                    ></iframe>
+                <Pane
+                    marginTop={32}
+                    width="100%"
+                    maxWidth="600px"
+                    padding={16}
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                >
+                    {!isSpotifyReady && <Spinner />}
+                    <Pane
+                        opacity={isSpotifyReady ? 1 : 0}
+                        transform={isSpotifyReady ? '' : 'translateY(50px)'}
+                        transitionDuration="1000ms"
+                        width="100%"
+                    >
+                        <iframe
+                            onLoad={() => setIsSpotifyReady(true)}
+                            style={{ borderRadius: '12px' }}
+                            src={`https://open.spotify.com/embed/playlist/${record.spotify_id}?utm_source=generator`}
+                            width="100%"
+                            height="380"
+                            frameBorder="0"
+                            allowfullscreen=""
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                            title="Spotify"
+                        ></iframe>
+                    </Pane>
+                </Pane>
+            )}
+
+            {record.maps_query && (
+                <Pane
+                    marginTop={16}
+                    width="100%"
+                    maxWidth="600px"
+                    padding={16}
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                >
+                    {!isMapsReady && <Spinner />}
+                    <Pane
+                        opacity={isMapsReady ? 1 : 0}
+                        transform={isMapsReady ? '' : 'translateY(50px)'}
+                        transitionDuration="1000ms"
+                        width="100%"
+                    >
+                        <iframe
+                            onLoad={() => setIsMapsReady(true)}
+                            width="100%"
+                            height="380px"
+                            frameborder="0"
+                            style={{ border: 0, borderRadius: '12px' }}
+                            referrerpolicy="no-referrer-when-downgrade"
+                            src={`https://www.google.com/maps/embed/v1/place?key=${process.env.REACT_APP_GOOGLE_MAPS_KEY}&q=${record.maps_query}`}
+                            allowfullscreen
+                            title="Google Maps"
+                        ></iframe>
+                    </Pane>
                 </Pane>
             )}
 
