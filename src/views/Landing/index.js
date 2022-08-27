@@ -81,7 +81,6 @@ const Landing = () => {
                 width="250px"
                 height="250px"
                 elevation={2}
-                marginTop={16}
             >
                 {!isImageReady && <Spinner position="absolute" />}
                 <Pane
