@@ -1,4 +1,5 @@
-import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
+import { faInstagram, faWhatsapp } from '@fortawesome/free-brands-svg-icons';
+import { faGlobe } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Airtable from 'airtable';
 import { Button, Heading, Pane, Spinner, Text } from 'evergreen-ui';
@@ -11,6 +12,7 @@ const Landing = () => {
     const [record, setRecord] = useState({});
     const [photo, setPhoto] = useState('');
     const [isLoading, setIsLoading] = useState(true);
+    const [isImageReady, setIsImageReady] = useState(false);
 
     const callbackResponse = (err, rec) => {
         if (err || rec.length === 0) {
@@ -42,6 +44,17 @@ const Landing = () => {
         window.open(record?.whatsapp, '_blank');
     };
 
+    const handleWebsiteClick = () => {
+        window.open(record?.website, '_blank');
+    };
+
+    const handleInstagramClick = () => {
+        window.open(
+            `https://instagram.com/${record?.instagram_username}`,
+            '_blank'
+        );
+    };
+
     if (isLoading) {
         return (
             <Pane display="flex" justifyContent="center" marginTop={32}>
@@ -69,7 +82,19 @@ const Landing = () => {
                 elevation={2}
                 marginTop={16}
             >
-                <img width="250px" src={photo} alt="profile" />
+                {!isImageReady && <Spinner position="absolute" />}
+                <Pane
+                    opacity={isImageReady ? 1 : 0}
+                    transitionDuration="1000ms"
+                >
+                    <img
+                        width="260px"
+                        height="260px"
+                        src={photo}
+                        alt="profile"
+                        onLoad={() => setIsImageReady(true)}
+                    />
+                </Pane>
             </Pane>
 
             <Pane
@@ -93,9 +118,15 @@ const Landing = () => {
                 <Text marginTop={16} textAlign="center">
                     {record?.description3}
                 </Text>
-
-                {record.whatsapp && (
-                    <Pane marginTop={16}>
+                <Pane
+                    marginTop={16}
+                    display="flex"
+                    gap={8}
+                    alignItems="center"
+                    justifyContent="center"
+                    flexWrap="wrap"
+                >
+                    {record.whatsapp && (
                         <Button
                             onClick={handleWhatsappClick}
                             appearance="primary"
@@ -106,8 +137,29 @@ const Landing = () => {
                             </Pane>
                             Whatsapp
                         </Button>
-                    </Pane>
-                )}
+                    )}
+
+                    {record.instagram_username && (
+                        <Button
+                            onClick={handleInstagramClick}
+                            appearance="instagram"
+                        >
+                            <Pane marginRight={8}>
+                                <FontAwesomeIcon icon={faInstagram} />
+                            </Pane>
+                            Instagram
+                        </Button>
+                    )}
+
+                    {record.website && (
+                        <Button onClick={handleWebsiteClick}>
+                            <Pane marginRight={8}>
+                                <FontAwesomeIcon icon={faGlobe} />
+                            </Pane>
+                            Website
+                        </Button>
+                    )}
+                </Pane>
             </Pane>
             <Badge />
         </Pane>

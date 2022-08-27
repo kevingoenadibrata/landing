@@ -20,6 +20,17 @@ const appTheme = mergeTheme(defaultTheme, {
                     fontWeight: 'fontWeights.bold'
                 }
             }
+        },
+        Button: {
+            appearances: {
+                instagram: {
+                    backgroundColor: '#8446ea',
+                    color: 'white',
+                    _hover: {
+                        backgroundColor: '#4a1a99'
+                    }
+                }
+            }
         }
     }
 });
