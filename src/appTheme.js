@@ -29,12 +29,17 @@ const appTheme = mergeTheme(defaultTheme, {
                     _hover: {
                         backgroundColor: '#4a1a99'
                     }
+                },
+                linkedin: {
+                    backgroundColor: 'colors.blue400',
+                    color: 'white',
+                    _hover: {
+                        backgroundColor: 'colors.blue700'
+                    }
                 }
             }
         }
     }
 });
-
-console.log(appTheme);
 
 export default appTheme;

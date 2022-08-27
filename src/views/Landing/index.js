@@ -1,4 +1,8 @@
-import { faInstagram, faWhatsapp } from '@fortawesome/free-brands-svg-icons';
+import {
+    faInstagram,
+    faLinkedin,
+    faWhatsapp
+} from '@fortawesome/free-brands-svg-icons';
 import { faGlobe } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Airtable from 'airtable';
@@ -56,6 +60,13 @@ const Landing = () => {
         );
     };
 
+    const handleLinkedinClick = () => {
+        window.open(
+            `https://linkedin.com/in/${record?.linkedin_username}`,
+            '_blank'
+        );
+    };
+
     if (isLoading) {
         return (
             <Pane display="flex" justifyContent="center" marginTop={32}>
@@ -66,7 +77,7 @@ const Landing = () => {
 
     return (
         <Pane
-            padding={32}
+            paddingTop={32}
             display="flex"
             width="100vw"
             alignItems="center"
@@ -159,9 +170,38 @@ const Landing = () => {
                             Website
                         </Button>
                     )}
+
+                    {record.linkedin_username && (
+                        <Button
+                            onClick={handleLinkedinClick}
+                            appearance="linkedin"
+                        >
+                            <Pane marginRight={8}>
+                                <FontAwesomeIcon icon={faLinkedin} />
+                            </Pane>
+                            LinkedIn
+                        </Button>
+                    )}
                 </Pane>
             </Pane>
-            <Badge />
+            {record.spotify_id && (
+                <Pane marginTop={32} width="100%" padding={16}>
+                    <iframe
+                        style={{ borderRadius: '12px' }}
+                        src={`https://open.spotify.com/embed/playlist/${record.spotify_id}?utm_source=generator`}
+                        width="100%%"
+                        height="380"
+                        frameBorder="0"
+                        allowfullscreen=""
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                        title="Spotify"
+                    ></iframe>
+                </Pane>
+            )}
+
+            <Pane marginTop={32} marginBottom={32}>
+                <Badge />
+            </Pane>
         </Pane>
     );
 };
